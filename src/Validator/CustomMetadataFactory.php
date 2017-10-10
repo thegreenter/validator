@@ -60,9 +60,9 @@ class CustomMetadataFactory implements MetadataFactoryInterface
      */
     private function getClassValidator($value)
     {
-        $className = basename(get_class($value));
+        $classModel = get_class($value);
+        $className = substr(strrchr($classModel, "\\"),1);
         $fullClass = 'Greenter\\Validator\\Loader\\'.$className.'Loader';
-        echo $fullClass .PHP_EOL;
 
         if (!class_exists($fullClass)) {
             return false;
