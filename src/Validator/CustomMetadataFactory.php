@@ -62,6 +62,7 @@ class CustomMetadataFactory implements MetadataFactoryInterface
     {
         $className = basename(get_class($value));
         $fullClass = 'Greenter\\Validator\\Loader\\'.$className.'Loader';
+        echo $fullClass .PHP_EOL;
 
         if (!class_exists($fullClass)) {
             return false;
