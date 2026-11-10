@@ -31,6 +31,53 @@ class CePerceptionValidatorTest extends TestCase
         $this->assertEquals(0, $errors->count());
     }
 
+    public function testValidatePerceptionWithIndExcepcional()
+    {
+        $perception = $this->getPerception();
+        $perception->setIndExcepcional('01');
+        $validator = $this->getValidator();
+        $errors = $validator->validate($perception);
+
+        $this->assertEquals(0, $errors->count());
+    }
+
+    public function testValidatePerceptionInvalidIndExcepcional()
+    {
+        $perception = $this->getPerception();
+        $perception->setIndExcepcional('1');
+        $validator = $this->getValidator();
+        $errors = $validator->validate($perception);
+
+        $this->assertEquals(1, $errors->count());
+        $this->assertEquals('indExcepcional', $errors->get(0)->getPropertyPath());
+    }
+
+    public function testValidatePerceptionMultiplesCobrosPorDetalle()
+    {
+        $perception = $this->getPerception();
+        $detail = $perception->getDetails()[0];
+        $cobro = (new Payment())
+            ->setNumero(2)
+            ->setMoneda('PEN')
+            ->setFecha(new DateTime())
+            ->setImporte(100);
+        $detail->setCobros(array_merge($detail->getCobros(), [$cobro]));
+
+        $errors = $this->getValidator()->validate($perception);
+
+        $this->assertEquals(1, $errors->count());
+    }
+
+    public function testValidatePerceptionNumeroCobroInvalido()
+    {
+        $perception = $this->getPerception();
+        $perception->getDetails()[0]->getCobros()[0]->setNumero(0);
+
+        $errors = $this->getValidator()->validate($perception);
+
+        $this->assertEquals(1, $errors->count());
+    }
+
     /**
      * @return Perception
      */
@@ -76,7 +123,8 @@ class CePerceptionValidatorTest extends TestCase
     private function getExtras()
     {
         $pay = new Payment();
-        $pay->setMoneda('PEN')
+        $pay->setNumero(1)
+            ->setMoneda('PEN')
             ->setFecha(new DateTime())
             ->setImporte(100);
 
